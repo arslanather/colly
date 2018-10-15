@@ -6,19 +6,18 @@ import (
 	"io/ioutil"
 	"os"
 	"time"
-	"../item"
 )
 
 
-var C chan item.Schema
+var C chan interface{}
 var exitSignal chan bool
 
 func DumpData(fileName string){
 	fmt.Println("Started dump routine")
-	C = make(chan item.Schema, 20)
+	C = make(chan interface{}, 20)
 	exitSignal = make(chan bool)
 	timer := time.NewTimer(2 * time.Second)
-	var items []item.Schema
+	var items []interface{}
 outerloop:
 	for true {
 		select {
@@ -42,7 +41,7 @@ outerloop:
 
 }
 
-func updateJson(items *[]item.Schema, fileName string){
+func updateJson(items *[]interface{}, fileName string){
 	_, err := os.Stat(fileName)
 	if err != nil {
 		result, _ := json.Marshal(*items)
@@ -55,7 +54,7 @@ func updateJson(items *[]item.Schema, fileName string){
 		fmt.Println(err)
 	}
 
-	var idents []item.Schema
+	var idents []interface{}
 	err = json.Unmarshal([]byte(jsonText), &idents)
 	if err != nil {
 		fmt.Println(err)
@@ -73,5 +72,4 @@ func Wait(){
 		case <-exitSignal:
 			fmt.Println("Succesfully imported data.")
 	}
-	//res := <-e_s
 }
